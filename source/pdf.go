@@ -8,8 +8,8 @@ import (
 	"github.com/edustor/gen/bindata"
 )
 
-const LR_MARGIN float64 = 7.0
-const TOP_MARGIN float64 = 15
+const LR_MARGIN float64 = 5.0
+const TOP_MARGIN float64 = 7.5
 const BOTTOM_MARGIN float64 = 10.0
 
 func GenPdf(writter io.Writer, pageCount int) error {
@@ -21,7 +21,7 @@ func GenPdf(writter io.Writer, pageCount int) error {
 
 	pdf.AddPage()
 	pdf.SetFont("Proxima Nova", "Thin", 11)
-	pdf.SetMargins(5, 5, 5)
+	pdf.SetMargins(0, 0, 0)
 	pdf.SetAutoPageBreak(false, 0)
 
 	pdf.SetLineWidth(0.2)
@@ -47,15 +47,17 @@ func GenPdf(writter io.Writer, pageCount int) error {
 
 	// Header
 
-	pdf.SetX(xMin)
-	pdf.SetY(5)
+	pdf.SetY(yMin - 2.7)
+	pdf.SetX(xMin - 1.4)
+	pdf.CellFormat(1, 1, "Edustor Alpha", "", 0, "", false, 0, "")
 
-	pdf.Cell(0, 10, "Edustor Alpha")
+	nextIdField := "#__________"
+	pdf.SetX(xMax - 1 - pdf.GetStringWidth(nextIdField))
+	pdf.CellFormat(1, 1, nextIdField, "", 0, "", false, 0, "")
 
 	err = pdf.Output(writter)
 	return err
 }
-
 
 func calculateMinMaxPoints(total float64, step float64, marginStart float64, marginEnd float64) (min float64, max float64) {
 	allowedUsage := total - (marginStart + marginEnd)
