@@ -3,6 +3,18 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "C+jj7/ZgDdvLIZuJhULuETGMx+E=",
+			"path": "github.com/jung-kurt/gofpdf",
+			"revision": "c81d351d55fabc44d050fb13ad7741a592f8b818",
+			"revisionTime": "2016-11-13T20:58:46Z"
+		},
+		{
+			"checksumSHA1": "X2ZRQ4fqi/jVJSZcc2ttuHO33Ek=",
+			"path": "github.com/urfave/negroni",
+			"revision": "e0e50f7dc431c043cb33f91b09c3419d48b7cff5",
+			"revisionTime": "2016-11-02T02:38:13Z"
+		},
+		{
 			"checksumSHA1": "hiOUviIMDKo7y918uBiEhfJyOkk=",
 			"path": "gopkg.in/tylerb/graceful.v1",
 			"revision": "50a48b6e73fcc75b45e22c05b79629a67c79e938",
