@@ -3,8 +3,11 @@ package source
 import (
 	"github.com/jung-kurt/gofpdf"
 	"io"
-	"log"
 )
+
+const LR_MARGIN float64 = 5.0
+const TOP_MARGIN float64 = 5.0
+const BOTTOM_MARGIN float64 = 5.0
 
 func GenPdf(writter io.Writer) error {
 	pdf := gofpdf.New("P", "mm", "A4", "")
@@ -13,20 +16,24 @@ func GenPdf(writter io.Writer) error {
 	pdf.SetMargins(5, 5, 5)
 	pdf.SetAutoPageBreak(false, 0)
 
-	w, h := pdf.GetPageSize()
+	pdf.SetLineWidth(0.2)
 
-	rightBorder := w - 5
-	bottomBorder := h - 5
+	pageWidth, pageHeight := pdf.GetPageSize()
 
-	pdf.SetX(5)
-	pdf.SetY(5)
+	xMax := float64(int(pageWidth) - int(pageWidth) % 5) - 5
+	yMax := float64(int(pageHeight) - int(pageHeight) % 5) - 5
 
-	for pdf.GetY() + 5 < bottomBorder {
-		log.Printf("%v %v", pdf.GetX(), pdf.GetY())
-		for pdf.GetX() + 5 < rightBorder {
-			pdf.CellFormat(5, 5, "", "LT", 0, "", false, 0, "")
-		}
-		pdf.Ln(-1)
+	//rightBorder := w - 5
+	//bottomBorder := h - 5
+
+
+	for x := 5.0; x <= xMax; x += 5 {
+		pdf.Line(x, 5, x, yMax)
+	}
+
+
+	for y := 5.0; y <= yMax; y += 5 {
+		pdf.Line(5, y, xMax, y)
 	}
 
 
