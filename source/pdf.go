@@ -5,16 +5,22 @@ import (
 	"io"
 	"math"
 	"log"
+	"github.com/edustor/gen/bindata"
 )
 
-const LR_MARGIN float64 = 9.0
-const TOP_MARGIN float64 = 20
-const BOTTOM_MARGIN float64 = 5.0
+const LR_MARGIN float64 = 7.0
+const TOP_MARGIN float64 = 15
+const BOTTOM_MARGIN float64 = 10.0
 
 func GenPdf(writter io.Writer, pageCount int) error {
 	pdf := gofpdf.New("P", "mm", "A4", "")
+
+	fontJson, err := bindata.Asset("fonts/Proxima Nova Thin.json")
+	fontZ, err := bindata.Asset("fonts/Proxima Nova Thin.z")
+	pdf.AddFontFromBytes("Proxima Nova", "Thin", fontJson, fontZ)
+
 	pdf.AddPage()
-	pdf.SetFont("Helvetica", "B", 16)
+	pdf.SetFont("Proxima Nova", "Thin", 11)
 	pdf.SetMargins(5, 5, 5)
 	pdf.SetAutoPageBreak(false, 0)
 
@@ -29,6 +35,8 @@ func GenPdf(writter io.Writer, pageCount int) error {
 	log.Printf("%v %v", xMin, xMax)
 	log.Printf("%v %v", yMin, yMax)
 
+	// Grid
+
 	for x := xMin; x <= xMax; x += 5 {
 		pdf.Line(x, yMin, x, yMax)
 	}
@@ -37,7 +45,14 @@ func GenPdf(writter io.Writer, pageCount int) error {
 		pdf.Line(xMin, y, xMax, y)
 	}
 
-	err := pdf.Output(writter)
+	// Header
+
+	pdf.SetX(xMin)
+	pdf.SetY(5)
+
+	pdf.Cell(0, 10, "Edustor Alpha")
+
+	err = pdf.Output(writter)
 	return err
 }
 
@@ -52,9 +67,7 @@ func calculateMinMaxPoints(total float64, step float64, marginStart float64, mar
 	max = total - (marginEnd + additionalMargin)
 
 	e := math.Mod(max - min, step)
-	//max = max - e
-
-	log.Printf("allowedUsage %v maxRound: %v margin %v e %v", allowedUsage, maxRoundUsage, additionalMargin, e)
+	log.Printf("allowedUsage %v maxRoundUsage: %v additionalMargin %v e %v", allowedUsage, maxRoundUsage, additionalMargin, e)
 
 	return
 }
