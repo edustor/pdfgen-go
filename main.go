@@ -28,7 +28,7 @@ func main() {
 
 func handleRoot(rw http.ResponseWriter, req *http.Request) {
 	log.Printf("Processing request %v from %v", req.URL, req.RemoteAddr)
-	err := source.GenPdf(rw)
+	err := source.GenPdf(rw, 1)
 	if (err != nil) {
 		log.Panic(err)
 	}
