@@ -7,8 +7,8 @@ import (
 	"log"
 )
 
-const LR_MARGIN float64 = 5.0
-const TOP_MARGIN float64 = 5.0
+const LR_MARGIN float64 = 9.0
+const TOP_MARGIN float64 = 20
 const BOTTOM_MARGIN float64 = 5.0
 
 func GenPdf(writter io.Writer, pageCount int) error {
@@ -44,7 +44,7 @@ func GenPdf(writter io.Writer, pageCount int) error {
 
 func calculateMinMaxPoints(total float64, step float64, marginStart float64, marginEnd float64) (min float64, max float64) {
 	allowedUsage := total - (marginStart + marginEnd)
-	maxRoundUsage := allowedUsage - math.Mod(total, step)
+	maxRoundUsage := allowedUsage - math.Mod(allowedUsage, step)
 
 	additionalMargin := (allowedUsage - maxRoundUsage) / 2
 
