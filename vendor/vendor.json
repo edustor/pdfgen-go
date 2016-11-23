@@ -1,6 +1,13 @@
 {
 	"comment": "",
 	"ignore": "test",
-	"package": [],
+	"package": [
+		{
+			"checksumSHA1": "hiOUviIMDKo7y918uBiEhfJyOkk=",
+			"path": "gopkg.in/tylerb/graceful.v1",
+			"revision": "50a48b6e73fcc75b45e22c05b79629a67c79e938",
+			"revisionTime": "2016-08-29T01:00:30Z"
+		}
+	],
 	"rootPath": "github.com/edustor/gen"
 }
