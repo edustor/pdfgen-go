@@ -12,51 +12,56 @@ const LR_MARGIN float64 = 5.0
 const TOP_MARGIN float64 = 7.5
 const BOTTOM_MARGIN float64 = 10.0
 
-func GenPdf(writter io.Writer, pageCount int) error {
+func GenPdf(writter io.Writer, pageCount int) (err error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
-
-	fontJson, err := bindata.Asset("fonts/Proxima Nova Thin.json")
-	fontZ, err := bindata.Asset("fonts/Proxima Nova Thin.z")
-	pdf.AddFontFromBytes("Proxima Nova", "Thin", fontJson, fontZ)
+	template := pdf.CreateTemplate(createTemplate)
 
 	pdf.AddPage()
-	pdf.SetFont("Proxima Nova", "Thin", 11)
-	pdf.SetMargins(0, 0, 0)
-	pdf.SetAutoPageBreak(false, 0)
+	pdf.UseTemplate(template)
 
-	pdf.SetLineWidth(0.2)
-	pdf.SetDrawColor(128, 128, 128)
+	err = pdf.Output(writter)
+	return err
+}
 
-	pageWidth, pageHeight := pdf.GetPageSize()
+func createTemplate(tpl *gofpdf.Tpl) {
+	fontJson, err := bindata.Asset("fonts/Proxima Nova Thin.json")
+	if err != nil {
+		log.Panic(err)
+	}
+	fontZ, err := bindata.Asset("fonts/Proxima Nova Thin.z")
+	if err != nil {
+		log.Panic(err)
+	}
+	tpl.AddFontFromBytes("Proxima Nova", "Thin", fontJson, fontZ)
+	tpl.SetFont("Proxima Nova", "Thin", 11)
+	tpl.SetMargins(0, 0, 0)
+	tpl.SetAutoPageBreak(false, 0)
+
+	tpl.SetLineWidth(0.2)
+	tpl.SetDrawColor(128, 128, 128)
+
+	pageWidth, pageHeight := tpl.GetPageSize()
 
 	xMin, xMax := calculateMinMaxPoints(pageWidth, 5.0, LR_MARGIN, LR_MARGIN)
 	yMin, yMax := calculateMinMaxPoints(pageHeight, 5.0, TOP_MARGIN, BOTTOM_MARGIN)
 
-	log.Printf("%v %v", xMin, xMax)
-	log.Printf("%v %v", yMin, yMax)
-
 	// Grid
-
 	for x := xMin; x <= xMax; x += 5 {
-		pdf.Line(x, yMin, x, yMax)
+		tpl.Line(x, yMin, x, yMax)
 	}
 
 	for y := yMin; y <= yMax; y += 5 {
-		pdf.Line(xMin, y, xMax, y)
+		tpl.Line(xMin, y, xMax, y)
 	}
 
 	// Header
-
-	pdf.SetY(yMin - 2.7)
-	pdf.SetX(xMin - 1.4)
-	pdf.CellFormat(1, 1, "Edustor Alpha", "", 0, "", false, 0, "")
+	tpl.SetY(yMin - 2.7)
+	tpl.SetX(xMin - 1.4)
+	tpl.CellFormat(1, 1, "Edustor Alpha", "", 0, "", false, 0, "")
 
 	nextIdField := "#__________"
-	pdf.SetX(xMax - 1 - pdf.GetStringWidth(nextIdField))
-	pdf.CellFormat(1, 1, nextIdField, "", 0, "", false, 0, "")
-
-	err = pdf.Output(writter)
-	return err
+	tpl.SetX(xMax - 1 - tpl.GetStringWidth(nextIdField))
+	tpl.CellFormat(1, 1, nextIdField, "", 0, "", false, 0, "")
 }
 
 func calculateMinMaxPoints(total float64, step float64, marginStart float64, marginEnd float64) (min float64, max float64) {
