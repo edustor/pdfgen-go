@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"bytes"
 )
 
 func GenPdf(writter io.Writer, pageCount int) (err error) {
@@ -96,4 +97,9 @@ func drawPage(pdf *gofpdf.Fpdf, pageId string, qrImage []byte) {
 	// Print bottom id
 	pdf.SetX(xMax - 1 - pdf.GetStringWidth(bottomId))
 	pdf.CellFormat(1, 1, bottomId, "", 0, "", false, 0, "")
+
+	// Draw image
+	qrImageId := fmt.Sprintf("qr_%v", pageId)
+	pdf.RegisterImageOptionsReader(qrImageId, gofpdf.ImageOptions{ImageType: "PNG"}, bytes.NewReader(qrImage))
+	pdf.ImageOptions(qrImageId, xMax - 15, yMax - 15, 15, 15, false, gofpdf.ImageOptions{}, 0, "")
 }
