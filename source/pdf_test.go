@@ -4,7 +4,6 @@ import (
 	"testing"
 	"os"
 	"log"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGenPdf(t *testing.T) {
@@ -18,15 +17,4 @@ func TestGenPdf(t *testing.T) {
 	if err != nil {
 		log.Panic(err)
 	}
-}
-
-func TestCalculateMinMax(t *testing.T) {
-	max, min := calculateMinMaxPoints(210, 5, 5, 5)
-	assert.EqualValues(t, 5, max)
-	assert.EqualValues(t, 205, min)
-
-	max, min = calculateMinMaxPoints(297, 5, 5, 5)
-	assert.EqualValues(t, 6, max)
-
-	assert.EqualValues(t, 291, min)
 }
