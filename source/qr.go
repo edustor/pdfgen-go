@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/oliamb/cutter"
 	qr "github.com/skip2/go-qrcode"
-	"image/png"
+	"image/jpeg"
 )
 
 func GenQR(content string) ([]byte, error) {
@@ -18,14 +18,14 @@ func GenQR(content string) ([]byte, error) {
 	image := code.Image(200)
 
 	image, err = cutter.Crop(image, cutter.Config{
-		Width:  150,
-		Height: 150,
+		Width:  135,
+		Height: 135,
 		Mode:   cutter.Centered,
 	})
 
 	buffer := bytes.NewBuffer(make([]byte, 0))
 
-	png.Encode(buffer, image)
+	jpeg.Encode(buffer, image, &jpeg.Options{Quality: 100})
 
 	return buffer.Bytes(), nil
 }

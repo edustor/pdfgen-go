@@ -16,7 +16,8 @@ import (
 
 func GenPdf(writter io.Writer, pageCount int) (err error) {
 	pdf := gopdf.GoPdf{}
-	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: 210, H: 297}})
+	pageSize := gopdf.Rect{W: 595.28, H: 841.89}
+	pdf.Start(gopdf.Config{PageSize: pageSize})
 
 	tempDir, err := ioutil.TempDir("", "edustor-pdfgen")
 	if err != nil {
@@ -27,7 +28,7 @@ func GenPdf(writter io.Writer, pageCount int) (err error) {
 		pdf.AddPage()
 
 		pageId := uuid.NewV4().String()
-		uri := fmt.Sprintf("edustor://d/%s", pageId)
+		uri := fmt.Sprintf("https://edustor.ru/p/%s", pageId)
 		qr, err := GenQR(uri)
 		if err != nil {
 			panic(err)
@@ -44,7 +45,7 @@ func GenPdf(writter io.Writer, pageCount int) (err error) {
 		}
 		qrFile.Close()
 
-		drawPage(&pdf, pageId, qrFile.Name())
+		drawPage(&pdf, pageSize, pageId, qrFile.Name())
 	}
 
 	pdfBytes := pdf.GetBytesPdf()
@@ -54,7 +55,7 @@ func GenPdf(writter io.Writer, pageCount int) (err error) {
 	return err
 }
 
-func drawPage(pdf *gopdf.GoPdf, pageId string, qrImagePath string) {
+func drawPage(pdf *gopdf.GoPdf, pageSize gopdf.Rect, pageId string, qrImagePath string) {
 	//TODO: BUG: Text is not visible
 	fontTTF, err := bindata.Asset("fonts/Proxima Nova Thin.ttf")
 	if err != nil {
@@ -66,23 +67,22 @@ func drawPage(pdf *gopdf.GoPdf, pageId string, qrImagePath string) {
 	pdf.SetLineWidth(0.01)
 	pdf.SetStrokeColor(128, 128, 128)
 
-	pageWidth, pageHeight := 210.0, 297.0
-
 	const X_CELLS = 40
 	const Y_CELLS = 56
+	const CELL_SIDE = 5 / 25.4 * 72
 
-	xMargin := (pageWidth - (X_CELLS * 5)) / 2
-	yMargin := (pageHeight - (Y_CELLS * 5)) / 2
+	xMargin := (pageSize.W - (X_CELLS * CELL_SIDE)) / 2
+	yMargin := (pageSize.H - (Y_CELLS * CELL_SIDE)) / 2
 
-	xMin, xMax := xMargin, pageWidth-xMargin
-	yMin, yMax := yMargin, pageHeight-yMargin
+	xMin, xMax := xMargin, pageSize.W-xMargin
+	yMin, yMax := yMargin, pageSize.H-yMargin
 
 	// Grid
-	for x := xMin; x <= xMax; x += 5 {
+	for x := xMin; x <= xMax; x += CELL_SIDE {
 		pdf.Line(x, yMin, x, yMax)
 	}
 
-	for y := yMin; y <= yMax; y += 5 {
+	for y := yMin; y <= yMax; y += CELL_SIDE {
 		pdf.Line(xMin, y, xMax, y)
 	}
 
@@ -94,8 +94,8 @@ func drawPage(pdf *gopdf.GoPdf, pageId string, qrImagePath string) {
 	bottomId := fmt.Sprintf("#%s-%s-%s", _idTail[0:4], _idTail[4:8], _idTail[8:12])
 
 	// Print header
-	pdf.SetY(yMin - 2.8)
-	pdf.SetX(xMin - 1)
+	pdf.SetY(yMin - 12)
+	pdf.SetX(xMin)
 	pdf.Cell(nil, "Edustor Alpha")
 
 	topWidth, err := pdf.MeasureTextWidth(topId)
@@ -118,5 +118,5 @@ func drawPage(pdf *gopdf.GoPdf, pageId string, qrImagePath string) {
 	pdf.Cell(&gopdf.Rect{W: 1, H: 1}, bottomId)
 
 	// Draw image
-	pdf.Image(qrImagePath, xMax - 15, yMax - 15, &gopdf.Rect{15, 15})
+	pdf.Image(qrImagePath, xMax-3*CELL_SIDE, yMax-3*CELL_SIDE, &gopdf.Rect{3 * CELL_SIDE, 3 * CELL_SIDE})
 }
